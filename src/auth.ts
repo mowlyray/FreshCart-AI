@@ -27,7 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("incorrect password")
           }
           return {
-            id:user._id,
+            id:user._id.toString(),
             name:user.name,
             email:user.email,
             role:user.role
@@ -44,6 +44,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.email=user.email,
         token.role=user.role
       }
+      return token
+    },
+
+    session({session,token}) {
+      if(session.user){
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        session.user.id=token.id as string,
+        session.user.name=token.name as string,
+        session.user.email=token.email as string,
+        session.user.role=token.role as string
+      }
+      return session
     },
   }
 })
