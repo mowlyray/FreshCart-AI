@@ -36,6 +36,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     })
   ],
+  callbacks:{
+    jwt({token,user}) {
+      if(user){
+        token.id=user.id,
+        token.name=user.name,
+        token.email=user.email,
+        token.role=user.role
+      }
+    },
+  }
 })
 
 //sign in step
