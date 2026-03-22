@@ -8,7 +8,7 @@ function Register() {
   return (
     <div>
       {
-        step==1 ?<Welcome/>:<RegisterForm/>
+        step==1 ?<Welcome nextStep={setStep}/>:<RegisterForm/>
       }
 
       
