@@ -78,13 +78,21 @@ function RegisterForm({previousStep}:propType) {
         <div className='relative'>
           <Lock className='absolute left-3 top-3.5 w-5 h-5  text-gray-400'/>
 
-          <input type={showPassword ? 'text' : 'password'} placeholder='Your password' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500'
+          <input
+              name='password'
+              type="password"
+              required
+              className=" block w-full px-4 py-3 pl-10 pr-4 border border-gray-300 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 outline-none"
+              placeholder="Enter your password"
+            />
+
+          {/* <input type={showPassword ? 'text' : 'password'} placeholder='Your password' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500'
           onChange={(e) => setPassword(e.target.value)} value={password}/>
 
 
           {
             showPassword ? <EyeOff className='absolute right-3 top-3.5 w-5 h-5 text-gray-500 cursor-pointer' onClick={()=>setShowPassword(false)} /> : <EyeIcon className='absolute right-3 top-3.5 w-5 h-5 text-gray-500 cursor-pointer' onClick={()=>setShowPassword(true)}/>
-          }
+          } */}
         </div>
         
         {
