@@ -1,9 +1,10 @@
-import { ArrowLeft, EyeIcon, EyeOff, Key, Leaf, Lock, LogIn, Mail, User } from 'lucide-react'
+import { ArrowLeft, EyeIcon, EyeOff, Key, Leaf, Loader2, Lock, LogIn, Mail, User } from 'lucide-react'
 import React, { useState } from 'react'
 import { motion } from 'motion/react'
 import Image from 'next/image'
 import googleImage from '../assets/google.png'
 import axios from 'axios'
+import { set } from 'mongoose'
 
 type propType={
     previousStep:(s:number)=>void
@@ -15,17 +16,22 @@ function RegisterForm({previousStep}:propType) {
   const [password,setPassword] = useState("")
   const [showPassword,setShowPassword] = useState(false)
 
+  const [loading,setLoading] = useState(false)
+
   const handleRegister =async (e:React.FormEvent)=>{
     e.preventDefault()
+    setLoading(true)
     try {
       const result=await axios.post("/api/auth/register",{
         name,
         email,
         password
       })
-       console.log(result.data)      
+       console.log(result.data)   
+       setLoading(false)   
     }catch (error) {
       console.log(error)
+      setLoading(false)
     }
   }
 
@@ -78,28 +84,29 @@ function RegisterForm({previousStep}:propType) {
         <div className='relative'>
           <Lock className='absolute left-3 top-3.5 w-5 h-5  text-gray-400'/>
 
-          <input
+          {/* <input
               name='password'
               type="password"
               required
-              className=" block w-full px-4 py-3 pl-10 pr-4 border border-gray-300 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 outline-none"
+              className="block w-full px-4 py-3 pl-10 pr-4 border border-gray-300 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 outline-none"
               placeholder="Enter your password"
-            />
+            /> */}
 
-          {/* <input type={showPassword ? 'text' : 'password'} placeholder='Your password' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500'
+          <input type={showPassword ? 'text' : 'password'} placeholder='Your password' className='w-full border border-gray-300 rounded-xl py-3 pl-10 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500'
           onChange={(e) => setPassword(e.target.value)} value={password}/>
 
 
           {
             showPassword ? <EyeOff className='absolute right-3 top-3.5 w-5 h-5 text-gray-500 cursor-pointer' onClick={()=>setShowPassword(false)} /> : <EyeIcon className='absolute right-3 top-3.5 w-5 h-5 text-gray-500 cursor-pointer' onClick={()=>setShowPassword(true)}/>
-          } */}
+          }
         </div>
         
         {
           (()=>{
             const formValidation = name!=="" && email!=="" && password!==""
-            return <button disabled={!formValidation} className={`w-full font-semibold py-3 rounded-xl shadow-md transition-all duration-200  ${formValidation ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-              Register
+            return <button disabled={!formValidation || loading} className={`w-full font-semibold py-3 rounded-xl shadow-md transition-all duration-200  ${formValidation ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+              {loading ? <Loader2 className='animate-spin h-5 w-5 mx-auto'/> : "Register"}
+              
 
             </button>
           })()
