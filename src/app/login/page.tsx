@@ -6,7 +6,7 @@ import Image from 'next/image'
 import googleImage from '../../assets/google.png'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 
 
 function Login() {
@@ -16,6 +16,9 @@ function Login() {
 
   const [loading,setLoading] = useState(false)
   const router=useRouter()
+  const session=useSession()
+  console.log(session)
+
   const handleLogin =async (e:FormEvent)=>{
     e.preventDefault()
     setLoading(true)
