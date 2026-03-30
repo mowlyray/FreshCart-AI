@@ -1,11 +1,12 @@
 'use client'
 import { ArrowLeft, EyeIcon, EyeOff, Key, Leaf, Loader2, Lock, LogIn, Mail, User } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import { motion } from 'motion/react'
 import Image from 'next/image'
 import googleImage from '../../assets/google.png'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 
 function Login() {
@@ -15,6 +16,23 @@ function Login() {
 
   const [loading,setLoading] = useState(false)
   const router=useRouter()
+  const handleLogin =async (e:FormEvent)=>{
+    e.preventDefault()
+    setLoading(true)
+    try {
+      await signIn("credentials",{
+        email,
+        password,
+        redirect:false
+      })
+      setLoading(false)
+      
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+    }
+
+  }
 
   
 
@@ -35,7 +53,8 @@ function Login() {
       }}
        className='text-4xl font-extrabold text-green-700 mb-2'>Welcome Back</motion.h1>
        <p className='text-gray-600 mb-8 flex items-center'>Login to Freshcart AI  <Leaf className='w-5 h-5 text-green-600'/></p>
-       <motion.form initial={{
+
+       <motion.form onSubmit={handleLogin} initial={{
         opacity:0
       }}
       animate={{
