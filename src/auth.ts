@@ -1,10 +1,10 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { async } from './../.next/dev/types/routes.d';
 import connectDb from "./lib/db";
 import bcrypt from "bcryptjs";
 import User from "./models/user.model";
 import Google from "next-auth/providers/google";
+import { image } from "framer-motion/client";
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -43,6 +43,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
   ],
   callbacks:{
+
+    async signIn({user,account}) {
+      if(account?.provider==="google"){
+        await connectDb()
+        let dbUser=await User.findOne({email:user.email})
+        if(!dbUser) {
+          dbUser=await User.create({
+            name:user.name,
+            email:user.email, 
+            image:user.image, 
+        })
+      }
+
+      user.id=dbUser._id.toString()
+      user.role=dbUser.role
+    }
+      return true
+    },
+
     jwt({token,user}) {
       if(user){
         token.id=user.id,
