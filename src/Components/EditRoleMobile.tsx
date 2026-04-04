@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { ArrowRight, Bike, User, UserCog } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 
 function EditRoleMobile() {
@@ -13,7 +13,7 @@ function EditRoleMobile() {
     {id:"deliveryBoy",label:"Delivery Boy",icon:Bike}
   ])
 
-  // const router = useRouter()
+    const router = useRouter()
 
 
   const [selectedRole,setSelectedRole]=useState("")
@@ -24,8 +24,7 @@ function EditRoleMobile() {
         role:selectedRole,
         mobile
       })
-      console.log(result.data)
-      // router.push('/home')
+      router.push("/")
     }catch (error) {
       console.log(error)
     }
