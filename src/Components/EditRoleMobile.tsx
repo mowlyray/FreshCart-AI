@@ -1,6 +1,8 @@
 'use client'
+import axios from 'axios'
 import { ArrowRight, Bike, User, UserCog } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 function EditRoleMobile() {
@@ -11,8 +13,23 @@ function EditRoleMobile() {
     {id:"deliveryBoy",label:"Delivery Boy",icon:Bike}
   ])
 
+  // const router = useRouter()
+
+
   const [selectedRole,setSelectedRole]=useState("")
   const [mobile,setMobile]=useState("")
+  const handleEdit=async ()=>{
+    try {
+      const result = await axios.post("/api/user/edit-role-mobile",{
+        role:selectedRole,
+        mobile
+      })
+      console.log(result.data)
+      // router.push('/home')
+    }catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <div className='flex flex-col items-center min-h-screen p-6 w-full '>
@@ -73,6 +90,10 @@ function EditRoleMobile() {
           ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer' 
           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
         }`}
+
+        onClick={handleEdit}
+
+
         >
           Go to Home
           <ArrowRight />

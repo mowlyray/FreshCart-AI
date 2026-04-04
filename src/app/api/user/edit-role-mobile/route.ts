@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import User from "@/models/user.model";
+import connectDb from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req:NextRequest) {
@@ -9,7 +10,7 @@ export async function POST(req:NextRequest) {
         const session=await auth()
         const user = await User.findOneAndUpdate({email:session?.user?.email},{
             role,mobile
-        })
+        },{new:true})
         if(!user) {
             return NextResponse.json(
                 {message:"User not found"},{status:400}
