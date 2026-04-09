@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import EditRoleMobile from '@/Components/EditRoleMobile'
+import Nav from '@/Components/Nav'
 import connectDb from '@/lib/db'
 import User from '@/models/user.model'
 import { redirect } from 'next/dist/server/api-utils'
@@ -22,9 +23,9 @@ async function Home() {
     }
 
   return (
-    <div>
-      
-    </div>
+    <>
+      <Nav />
+    </>
   )
 }
 
