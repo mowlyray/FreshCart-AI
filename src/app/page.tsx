@@ -1,9 +1,12 @@
 import { auth } from '@/auth'
+import AdminDashboard from '@/Components/AdminDashboard'
+import DeliveryBoy from '@/Components/DeliveryBoy'
 import EditRoleMobile from '@/Components/EditRoleMobile'
 import Nav from '@/Components/Nav'
+import UserDashboard from '@/Components/UserDashboard'
 import connectDb from '@/lib/db'
 import User from '@/models/user.model'
-import { redirect } from 'next/dist/server/api-utils'
+import { redirect } from 'next/navigation'
 import React from 'react'
 
 async function Home() {
@@ -27,6 +30,11 @@ async function Home() {
   return (
     <>
       <Nav user={plainUser} />
+      {user.role=="user" ?(
+        <UserDashboard/>
+      ) : user.role== "admin" ? (
+        <AdminDashboard />
+      ) : <DeliveryBoy/>}
     </>
   )
 }
