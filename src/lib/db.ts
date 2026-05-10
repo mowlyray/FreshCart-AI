@@ -1,30 +1,55 @@
 import mongoose from "mongoose";
 
-const mongodbUrl=process.env.MONGODB_URL
+import dns from "dns/promises";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+const mongodbUrl = process.env.MONGODB_URL;
 
 if (!mongodbUrl) {
-  throw new Error("db error");
+  throw new Error("Please define the MONGODB_URL");
 }
 
-let cached=global.mongoose
-if(!cached){
-    cached=global.mongoose={conn:null,promise:null}
+interface MongooseCache {
+  conn: mongoose.Mongoose | null;
+  promise: Promise<mongoose.Mongoose> | null;
 }
 
-const connectDb=async()=>{
-    if(cached.conn){
-        return cached.conn
-    }
-    if(!cached.promise){
-        cached.promise=mongoose.connect(mongodbUrl).then((conn)=>conn.connection)
-
-    }
-    try {
-        const conn=await cached.promise
-        return conn
-    } catch (error) {
-        console.log(error)
-    }
+declare global {
+  var mongoose: MongooseCache | undefined;
 }
 
-export default connectDb
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = {
+    conn: null,
+    promise: null,
+  };
+}
+
+const connectDb = async () => {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(mongodbUrl);
+  }
+
+  try {
+    cached.conn = await cached.promise;
+
+    console.log("MongoDB Connected");
+
+    return cached.conn;
+  } catch (error) {
+    cached.promise = null;
+
+    console.log("MongoDB Connection Error:", error);
+
+    throw error;
+  }
+};
+
+export default connectDb;
