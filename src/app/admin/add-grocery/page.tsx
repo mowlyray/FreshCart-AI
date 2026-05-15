@@ -153,7 +153,15 @@ function AddGrocery() {
             onChange={handleImageChange}
 
             />
-            {preview && <Image src={preview} alt="image" className='shadow-md border border-gray-200 object-cover rounded-xl' />}
+            {preview && (
+  <Image
+    src={preview}
+    alt="image"
+    width={120}
+    height={120}
+    className='w-28 h-28 object-cover rounded-xl shadow-md border border-gray-200'
+  />
+)}
           </div>
 
           <motion.button
