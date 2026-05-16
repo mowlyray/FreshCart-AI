@@ -22,7 +22,7 @@ function GroceryItemCard({item}:{item: IGrocery}) {
     initial={{ opacity: 0, y: 50, scale:0.9}}
     whileInView={{ opacity: 1, y: 0, scale:1 }}
     transition={{ duration: 0.6 }}
-    viewport={{ once: false, amount: 0.5 }}
+    viewport={{ once: false, amount: 0.3 }}
     className=' bg-white rounded-2xl shadow-sm hover:shadow-xl overflow-hidden border border-gray-100 flex flex-col transition-all duration-300'
     >
       <div className='relative w-full aspect-4/3 bg-gray-50 overflow-hidden group'>
@@ -38,10 +38,10 @@ function GroceryItemCard({item}:{item: IGrocery}) {
             <span className='text-lg font-bold text-green-700'>${item.price}</span>
         </div>
 
-        <motion.button className='mt-4 bg-green-600 text-white font-medium py-2 rounded-full text-sm hover:bg-green-700 transition-all  flex items-center justify-center gap-2 cursor-pointer'
+        <motion.button className='mt-4 w-full  bg-green-600 text-white font-medium py-2 rounded-full text-sm hover:bg-green-700 transition-all  flex items-center justify-center gap-2 cursor-pointer'
         whileTap={{ scale: 0.96 }}
         >
-            <ShoppingCart/>Add to Cart
+            <ShoppingCart className='w-4 h-4'/>Add to Cart
         </motion.button>
 
       </div>
