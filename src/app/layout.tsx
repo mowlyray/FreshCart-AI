@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Provider from "@/Provider";
+import StoreProvider from "@/redux/StoreProvider";
 
 
 
@@ -18,7 +19,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="w-full min-h-[200vh] bg-linear-to-b from-green-50 to-white">
           <Provider>
-            {children}
+            <StoreProvider>
+              {children}
+            </StoreProvider>
+            
           </Provider>
         
       </body>
