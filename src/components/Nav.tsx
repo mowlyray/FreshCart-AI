@@ -108,7 +108,7 @@ function Nav({user}:{user:IUser}) {
 
         </div>
 
-        <Link href={''} className='relative bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition'>
+        <Link href={'/user/cart'} className='relative bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md hover:scale-105 transition'>
         <ShoppingCartIcon className='text-green-600 w-6 h-10'/>
         <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold shadow'>{cartData.length}</span>
         </Link>
