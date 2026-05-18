@@ -1,5 +1,5 @@
 'use client'
-import { decreaseQuantity, increaseQuantity } from '@/redux/cartSlice'
+import { decreaseQuantity, increaseQuantity, removeFromCart } from '@/redux/cartSlice'
 import { AppDispatch, RootState } from '@/redux/store'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, Minus, Plus, ShoppingBasket, Trash2 } from 'lucide-react'
@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 function CartPage() {
 
-    const {cartData} = useSelector((state:RootState) => state.cart)
+    const {cartData,subTotal,finalTotal,deliveryFee} = useSelector((state:RootState) => state.cart)
 
     const dispatch = useDispatch<AppDispatch>()
 
@@ -46,7 +46,7 @@ function CartPage() {
             </motion.div>
         ):(
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-                <div>
+                <div className='lg:col-span-2 space-y-5'>
                     <AnimatePresence>
                         {cartData.map((item,index)=>(
                             <motion.div
@@ -72,7 +72,9 @@ function CartPage() {
                                     <button className='bg-white p-1.5 rounded-full hover:bg-green-100 transition-all border border-gray-200' onClick={()=>dispatch(increaseQuantity(item._id))}><Plus size={14} className='text-green-700'/></button>
                                 </div>
 
-                                <button className='sm:ml-4 mt-3 sm:mt-0 text-red-500 hover:text-red-700'><Trash2 size={18} /></button>
+                                <button className='sm:ml-4 mt-3 sm:mt-0 text-red-500 hover:text-red-700' onClick={()=>dispatch(removeFromCart(item._id))}>
+                                    <Trash2 size={18} />
+                                </button>
 
                             </motion.div>
 
@@ -82,6 +84,37 @@ function CartPage() {
 
                     </AnimatePresence>
                 </div>
+
+                <motion.div
+                initial={{ opacity: 0, x: 30}}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className='bg-white rounded-2xl shadow-xl p-6 h-fit sticky top-24 border border-gray-100 flex flex-col'
+                >
+                    <h2 className='text-lg sm:text-xl font-bold text-gray-800 mb-4'>Order Summary</h2>
+                     
+                     <div className='space-y-3 text-gray-700 text-sm sm:text-base'>
+                        <div className='flex justify-between'>
+                            <span>Subtotal</span>
+                            <span className='text-green-700 font-semibold'>${subTotal}</span>
+                        </div>
+
+                        <div className='flex justify-between'>
+                            <span>Delivery Fee</span>
+                            <span className='text-green-700 font-semibold'>${deliveryFee}</span>
+                        </div>
+
+                        <hr className='my-3'></hr>
+                        <div className='flex justify-between font-bold text-lg sm:text-xl'>
+                            <span>Final Total</span>
+                            <span className='text-green-700 font-semibold'>${finalTotal}</span>
+                        </div>
+                     </div>
+
+                     <motion.button whileTap={{scale:0.95}} className='w-full mt-6 cursor-pointer bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold text-sm sm:text-base'>
+                            Proceed to Checkout
+                     </motion.button>
+                </motion.div>
 
             </div>
         )}
