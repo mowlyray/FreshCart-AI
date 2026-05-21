@@ -36,7 +36,7 @@ const markerIcon = new Icon({
 function Checkout() {
   const router = useRouter();
   const { userData } = useSelector((state: RootState) => state.user);
-  const { subTotal,deliveryFee,finalTotal } = useSelector((state: RootState) => state.cart);
+  const { subTotal,deliveryFee,finalTotal,cartData } = useSelector((state: RootState) => state.cart);
   const [address, setAddress] = useState({
     fullName: "",
     mobile: "",
@@ -128,6 +128,44 @@ function Checkout() {
     };
     fetchAddress();
   }, [position]);
+
+  const handleCod=async ()=>{
+    if(!position){
+      return null
+    }
+    try {
+      const result=await axios.post("/api/user/order",{
+        userId:userData?._id,
+        items:cartData.map(item=>({
+          grocery:item._id,
+          name:item.name,
+          price:item.price,
+          unit:item.unit,
+          quantity:item.quantity,
+          image:item.image
+
+        })),
+        totalAmount:finalTotal,
+        address:{
+          fullName:address.fullName,
+          mobile:address.mobile,
+          city:address.city,
+          state:address.state,
+          fullAddress:address.fullAddress,
+          pincode:address.pinCode,
+          latitude:position[0],
+          longitude:position[1]
+        },
+        paymentMethod
+      })
+
+      console.log(result.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
 
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -378,7 +416,15 @@ function Checkout() {
 
           </div>
 
-          <motion.button whileTap={{scale:0.93}} className="w-full mt-6 bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold">
+          <motion.button whileTap={{scale:0.93}} className="w-full mt-6 bg-green-600 text-white py-3 rounded-full hover:bg-green-700 transition-all font-semibold"
+          onClick={()=>{
+            if(paymentMethod=="cod") {
+              handleCod()
+            }else{
+              null
+            }
+          }}
+          >
             {paymentMethod=="cod"?"Place Order" : "pay & Place Order"}
           </motion.button>
         </motion.div>
