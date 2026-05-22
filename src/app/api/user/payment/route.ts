@@ -37,11 +37,31 @@ export async function POST(req:NextRequest) {
         payment_method_types:["card"],
         mode:"payment",
         success_url:`${process.env.NEXT_BASE_URL}//user/order-success`,
-        cancel_url:`${process.env.NEXT_BASE_URL}/user/order-cancel`
+        cancel_url:`${process.env.NEXT_BASE_URL}/user/order-cancel`,
+         line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'FreshCart AI',
+          },
+          unit_amount: totalAmount*100,
+        },
+        quantity: 1,
+      },
+    ],
+    metadata:{orderId:newOrder._id.toString()}
 
     })
 
+    return NextResponse.json({url:session.url},
+        {status:200}
+    )
+
     } catch (error) {
+        return NextResponse.json(
+            { message: `order payment error ${error}` }, 
+            { status: 500 });
 
     }
 }
