@@ -3,19 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Leaf, ShoppingBasket, Smartphone, Truck } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { getSocket } from "@/lib/socket";
 
 function HeroSection() {
-  const { userData } = useSelector((state: RootState) => state.user);
 
-  useEffect(() => {
-    if (userData) {
-      const socket = getSocket();
-      socket.emit("identity", userData?._id);
-    }
-  }, [userData]);
 
   const slides = [
     {
