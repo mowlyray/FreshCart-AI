@@ -54,7 +54,7 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
             brodcastedTo:candidates,
             status:"brodcasted"
          })
-         order.assignment = deliveryAssignment._id;
+         order.assignment = deliveryAssignment._id
          deliveryBoysPayload = availableDeliveryBoys.map(b => ({
             id: b._id,
             name: b.name,
