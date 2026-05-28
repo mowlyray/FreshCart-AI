@@ -43,7 +43,7 @@ function ManageOrders() {
         <div className="space-y-4">
         {orders?.map((order,index)=>(
 
-          <AdminOrderCard order={order}/>
+          <AdminOrderCard key={order._id} order={order}/>
         ))
 
         }
