@@ -1,3 +1,4 @@
+import { getSocket } from "@/lib/socket";
 import { IOrder } from "@/models/order.model";
 import { motion } from "framer-motion";
 import {
@@ -9,10 +10,11 @@ import {
   Truck,
 } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function UserOrderCard({ order }: { order: IOrder }) {
   const [expanded, setExpanded] = useState(false);
+  const [status,setStatus]=useState(order.status)
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -26,6 +28,17 @@ function UserOrderCard({ order }: { order: IOrder }) {
         return "bg-gray-100 text-gray-600 border-gray-300";
     }
   };
+
+  useEffect(():any=>{
+    const socket=getSocket()
+    socket.on("order-status-update",(data)=>{
+      if(data.orderId.toString()==order?._id!.toString()){
+        setStatus(data.status)
+      }
+    })
+  })
+
+
 
   return (
     <motion.div
@@ -61,10 +74,10 @@ function UserOrderCard({ order }: { order: IOrder }) {
 
           <span
             className={`px-3 py-1 text-xs font-semibold border rounded-full ${getStatusColor(
-              order.status,
+              status
             )}`}
           >
-            {order.status}
+            {status}
           </span>
         </div>
       </div>
@@ -139,7 +152,7 @@ function UserOrderCard({ order }: { order: IOrder }) {
         <div className="border-t pt-3 flex justify-between items-center text-sm font-semibold text-gray-800">
             <div className="flex items-center gap-2 text-gray-700 text-sm">
                 <Truck size={16} className="text-green-600"/>
-                <span>Delivery: <span className="text-green-700 font-semibold">{order.status}</span></span>
+                <span>Delivery: <span className="text-green-700 font-semibold">{status}</span></span>
             </div>
 
             <div>
