@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import mongoose from "mongoose";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 
 interface IOrder{
@@ -56,7 +56,7 @@ interface IOrder{
 function AdminOrderCard({ order }: { order: IOrder }) {
   const statusOptions = ["pending", "out of delivery"];
   const [expanded, setExpanded] = useState(false);
-  const [status,setStatus]=useState<string>(order.status)
+  const [status,setStatus]=useState<string>("pending")
 
   const updateStatus = async (orderId: string, status: string) => {
     try {
@@ -70,6 +70,10 @@ function AdminOrderCard({ order }: { order: IOrder }) {
       console.log(error);
     }
   };
+
+  useEffect(()=>{
+    setStatus(order.status)
+  },[order])
 
   return (
     <motion.div
@@ -132,7 +136,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
               </div>
             </div>
 
-            <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">call</a>
+            <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 ml-4 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">call</a>
             
           </div>}
 

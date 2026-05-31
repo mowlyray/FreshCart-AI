@@ -131,7 +131,7 @@ function UserOrderCard({ order }: { order: IOrder }) {
           </div>
         )}
 
-        {order.assignedDeliveryBoy && <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+        {order.assignedDeliveryBoy && <><div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3 text-sm text-gray-700">
               <UserCheck className="text-blue-600" size={18}/>
               <div className="font-semibold text-gray-800">
@@ -141,12 +141,13 @@ function UserOrderCard({ order }: { order: IOrder }) {
               </div>
             </div>
 
-            <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">call</a>
-            
-          </div>}
+            <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">call</a>          
+          </div>
 
-
-
+          <button className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700"><Truck size={18}/>Truck Your Order</button>
+          </> 
+          
+          }
 
         <div className="flex items-center gap-2 text-gray-700 text-sm">
           <MapPin size={16} className="text-green-600" />

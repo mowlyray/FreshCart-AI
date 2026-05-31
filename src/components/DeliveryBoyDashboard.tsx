@@ -1,14 +1,19 @@
 "use client";
 import { getSocket } from "@/lib/socket";
 import { IDeliveryAssignment } from "@/models/deliveryAssignment.model";
+import { RootState } from "@/redux/store";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 function DeliveryBoyDashboard() {
   const [assignments, setAssignments] = useState<any[]>([]);
+  const {userData}=useSelector((state:RootState)=>state.user)
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
+  const [activeOrder,setActiveOrder]=useState<any>(null)
+  const [userLocation,setUserLocation]=useState<any>(null)
+
+  const fetchAssignments = async () => {
       try {
         const result = await axios.get("/api/delivery/get-assignments");
         setAssignments(result.data);
@@ -16,8 +21,7 @@ function DeliveryBoyDashboard() {
         console.log(error);
       }
     };
-    fetchAssignments();
-  }, []);
+
 
   useEffect((): any => {
     const socket = getSocket();
@@ -36,6 +40,43 @@ function DeliveryBoyDashboard() {
         console.log(error)
 
     }
+  }
+
+  const fetchCurrentOrder=async ()=>{
+    try {
+      const result=await axios.get("/api/delivery/current-order")
+      if(result.data.active){
+        setActiveOrder(result.data.assignment)
+        setUserLocation({
+          latitude:result.data.assignment.order.address.latitude,
+          longitude:result.data.assignment.order.address.longitude
+        })
+      }
+      
+    } catch(error){
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchCurrentOrder()
+    fetchAssignments()
+  }, [userData]);
+
+  if(activeOrder && userLocation){
+    return (
+      <div className="p-4 pt-[120px] min-h-screen bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl font-bold text-green-700 mb-2">Active Delivery</h1>
+          <p className="text-gray-600 text-sm mb-4">order#{activeOrder.order._id.slice(-6)}</p>
+
+          <div className="rounded-xl border shadow-lg overflow-hidden mb-6">
+
+          </div>
+        </div>
+
+      </div>
+    )
   }
 
 
