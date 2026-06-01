@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import mongoose from "mongoose";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface IOrder{
@@ -50,6 +51,8 @@ interface IOrder{
 function UserOrderCard({ order }: { order: IOrder }) {
   const [expanded, setExpanded] = useState(false);
   const [status,setStatus]=useState(order.status)
+
+  const router=useRouter()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -144,9 +147,8 @@ function UserOrderCard({ order }: { order: IOrder }) {
             <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">call</a>          
           </div>
 
-          <button className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700"><Truck size={18}/>Truck Your Order</button>
+          <button className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700" onClick={()=>router.push(`/user/track-order/${order._id?.toString()}`)}><Truck size={18}/>Truck Your Order</button>
           </> 
-          
           }
 
         <div className="flex items-center gap-2 text-gray-700 text-sm">
