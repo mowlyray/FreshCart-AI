@@ -11,8 +11,22 @@ interface Iprops {
 }
 
 import L, { LatLngExpression } from "leaflet";
-import { MapContainer, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+
+function Recenter({positions}: {positions:[number,number]}) {
+  const map = useMap();
+
+  if(positions[0]!==0 && positions[1]!==0){
+    map.setView(positions,map.getZoom(),{
+      animate:true
+    });
+  }
+  return null;
+}
+
+
+
 
 function LiveMap({ userLocation, deliveryBoyLocation }: Iprops) {
   const deliveryBoyIcon = L.icon({
