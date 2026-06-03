@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ILocation {
   latitude: number;
@@ -17,15 +17,16 @@ import "leaflet/dist/leaflet.css";
 function Recenter({positions}: {positions:[number,number]}) {
   const map = useMap();
 
-  if(positions[0]!==0 && positions[1]!==0){
+  useEffect(() =>{
+    if(positions[0]!==0 && positions[1]!==0){
     map.setView(positions,map.getZoom(),{
       animate:true
     });
   }
+  
+  },[positions,map])
   return null;
 }
-
-
 
 
 function LiveMap({ userLocation, deliveryBoyLocation }: Iprops) {
@@ -39,8 +40,6 @@ function LiveMap({ userLocation, deliveryBoyLocation }: Iprops) {
     iconSize: [45, 45],
   });
 
-  const center = [userLocation.latitude,userLocation.longitude]
-
   const linePositions=
        deliveryBoyLocation && userLocation 
        ?[
@@ -50,15 +49,21 @@ function LiveMap({ userLocation, deliveryBoyLocation }: Iprops) {
        ]
        :[]
 
+       const center = deliveryBoyLocation
+       ? [deliveryBoyLocation.latitude, deliveryBoyLocation.longitude]
+       : [userLocation.latitude, userLocation.longitude];
+
 
   return (
     <div className="w-full h-[500px] rounded-xl overflow-hidden shadow relative">
-      <MapContainer
-        center={center as LatLngExpression}
+      <MapContainer center={center as any}
+        
         zoom={13}
         scrollWheelZoom={true}
-        className="w-full h-full"
-      >
+        className="w-full h-full">
+
+          <Recenter positions={center as any} />
+      
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
