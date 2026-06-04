@@ -6,6 +6,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import LiveMap from "./LiveMap";
+import DeliveryChat from "./DeliveryChat";
 
 
 interface ILocation{
@@ -118,8 +119,9 @@ function DeliveryBoyDashboard() {
 
           <div className="rounded-xl border shadow-lg overflow-hidden mb-6">
             <LiveMap userLocation={userLocation} deliveryBoyLocation={deliveryBoyLocation} />
-
           </div>
+
+          <DeliveryChat orderId={activeOrder.order._id} deliveryBoyId={userData?._id!} />
         </div>
 
       </div>
@@ -135,9 +137,9 @@ function DeliveryBoyDashboard() {
           Delivery Assignment
         </h2>
 
-        {assignments.map((a) => (
+        {assignments.map((a,index) => (
           <div
-            key={a._id}
+            key={index}
             className="p-5 bg-white rounded-xl shadow mb-4 border"
           >
             <p>
