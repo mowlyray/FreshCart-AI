@@ -2,7 +2,7 @@ import { getSocket } from "@/lib/socket";
 import { IMessage } from "@/models/message.model";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { Send } from "lucide-react";
+import { Send, Sparkle } from "lucide-react";
 import mongoose from "mongoose";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -15,6 +15,8 @@ function DeliveryChat({ orderId, deliveryBoyId }: Props) {
   const [newMessage, setNewMessage] = React.useState("");
   const [messages, setMessages] = useState<IMessage[]>();
   const chatBoxRef = useRef<HTMLDivElement>(null)
+  const [loading,setLoading]=useState(false)
+  const [suggestions, setSuggestions]=useSta([])
 
   useEffect(() => {
     const socket = getSocket();
@@ -70,8 +72,59 @@ function DeliveryChat({ orderId, deliveryBoyId }: Props) {
     getAllMessages();
   }, []);
 
+  const getSuggestion=async ()=>{
+    setLoading(true)
+    try {
+      const lastMessage=messages?.filter(m=>m.senderId!==deliveryBoyId)?.at(-1)
+      const result=await axios.post("/api/chat/ai-suggestions",
+        {message:lastMessage?.text,role:"delivery_boy"})
+        setSuggestions(result.data)
+        setLoading(false)
+    } catch(error){
+      console.log(error)
+      setLoading(false)
+    }
+  }
+
+
+
+
   return (
     <div className="bg-white rounded-3xl border shadow-lg h-[430px] flex flex-col p-4">
+
+    <div className="flex justify-between items-center mb-3">
+      <span className="font-semibold text-gray-700 text-sm">Quick Replies</span>
+
+      <motion.button
+      whileTap={{scale:0.9}}
+      disabled={loading}
+      onClick={getSuggestion}
+      className="bg-purple-100 text-purple-700 px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer"
+      >
+        <Sparkle size={16}/>{loading?<Loader className="w-5 h-5 animate-spin"/>: "AI suggest"}
+
+      </motion.button>
+    </div>
+
+    <div className="flex gap-2 flex-wrap mb-3">
+      {suggestions.map((s, i)=> (
+        <motion.div
+        key={s}
+        whileTap={{scale: 0.92}}
+        className="px-3 cursor-pointer py-1 text-xs bg-green-50 border border-green-200 text-green-700 rounded-full"
+        onClick={()=>setNewMessage(s)}
+        >
+          {s}
+
+        </motion.div>
+      ))
+
+      }
+
+    </div>
+
+
+
       <div className="flex-1 overflow-y-auto p-2 space-y-3" ref={chatBoxRef}>
         <AnimatePresence>
           {messages?.map((msg, index) => (

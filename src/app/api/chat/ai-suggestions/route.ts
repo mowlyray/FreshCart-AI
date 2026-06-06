@@ -50,6 +50,12 @@ export async function POST(req: NextRequest) {
       });
 
     const data = await response.json();
+    const replyText=data.candidates?.[0].content.parts?.[0].text || ""
+
+    const suggestions=replyText
+    .split(",")
+    .map((s:string)=>s.trim())
+
     return NextResponse.json(
         data,{status:200}
     )
