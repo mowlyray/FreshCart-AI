@@ -2,7 +2,7 @@ import { getSocket } from "@/lib/socket";
 import { IMessage } from "@/models/message.model";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { Send, Sparkle } from "lucide-react";
+import { Loader, Send, Sparkle } from "lucide-react";
 import mongoose from "mongoose";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -16,7 +16,7 @@ function DeliveryChat({ orderId, deliveryBoyId }: Props) {
   const [messages, setMessages] = useState<IMessage[]>();
   const chatBoxRef = useRef<HTMLDivElement>(null)
   const [loading,setLoading]=useState(false)
-  const [suggestions, setSuggestions]=useSta([])
+  const [suggestions, setSuggestions]=useState([])
 
   useEffect(() => {
     const socket = getSocket();
@@ -101,7 +101,7 @@ function DeliveryChat({ orderId, deliveryBoyId }: Props) {
       onClick={getSuggestion}
       className="bg-purple-100 text-purple-700 px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer"
       >
-        <Sparkle size={16}/>{loading?<Loader className="w-5 h-5 animate-spin"/>: "AI suggest"}
+        <Sparkle size={14}/>{loading?<Loader className="w-5 h-5 animate-spin"/>: "AI suggest"}
 
       </motion.button>
     </div>

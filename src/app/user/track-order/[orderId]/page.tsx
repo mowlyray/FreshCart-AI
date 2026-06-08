@@ -7,7 +7,7 @@ import { IUser } from "@/models/user.model";
 import { RootState } from "@/redux/store";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Send, Sparkle } from "lucide-react";
+import { ArrowLeft, Send, Sparkle,Loader } from "lucide-react";
 import mongoose from "mongoose";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -57,12 +57,14 @@ function TrackOrder({ params }: { params: { orderId: string } }) {
   const [order, setOrder] = useState<IOrder>();
   const router = useRouter();
   const [newMessage, setNewMessage] = useState("");
-    const [messages, setMessages] = useState<IMessage[]>();
-    const chatBoxRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState<IMessage[]>();
+  const chatBoxRef = useRef<HTMLDivElement>(null);
 
-    const [suggestions, setSuggestions]=useState([
-        "hello","thank you","hii"
-      ])
+  const [loading,setLoading]=useState(false)
+    const [suggestions, setSuggestions]=useState([])
+  
+
+  
   const [userLocation, setUserLocation] = useState<ILocation>({
     latitude: 0,
     longitude: 0,
@@ -106,39 +108,37 @@ function TrackOrder({ params }: { params: { orderId: string } }) {
   }, [order]);
 
   useEffect(() => {
-      const socket = getSocket();
-      socket.emit("join-room", orderId);
-      socket.on("send-message",(message) =>{
-        if(message.roomId === orderId){
-            setMessages((prev) => [...prev!, message]);
-        }
-    })
+    const socket = getSocket();
+    socket.emit("join-room", orderId);
+    socket.on("send-message", (message) => {
+      if (message.roomId === orderId) {
+        setMessages((prev) => [...prev!, message]);
+      }
+    });
 
-    return ()=>{
-        socket.off("send-message")
-    }
-
-
-    }, []);
-  
-    const sendMsg = () => {
-      const socket = getSocket();
-  
-      const message = {
-        roomId: orderId,
-        senderId: userData?._id,
-        text: newMessage,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-      socket.emit("send-message", message);
-      
-      setNewMessage("");
+    return () => {
+      socket.off("send-message");
     };
+  }, []);
 
-    useEffect(() => {
+  const sendMsg = () => {
+    const socket = getSocket();
+
+    const message = {
+      roomId: orderId,
+      senderId: userData?._id,
+      text: newMessage,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+    socket.emit("send-message", message);
+
+    setNewMessage("");
+  };
+
+  useEffect(() => {
     const getAllMessages = async () => {
       try {
         const result = await axios.post("/api/chat/messages", {
@@ -152,12 +152,26 @@ function TrackOrder({ params }: { params: { orderId: string } }) {
     getAllMessages();
   }, []);
 
-  useEffect(() =>{
-      chatBoxRef.current?.scrollTo({
-          top: chatBoxRef.current.scrollHeight,
-          behavior: "smooth"
-      })
-    },[[messages]])
+  useEffect(() => {
+    chatBoxRef.current?.scrollTo({
+      top: chatBoxRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [[messages]]);
+
+    const getSuggestion=async ()=>{
+      setLoading(true)
+      try {
+        const lastMessage=messages?.filter(m=>m.senderId!==userData?._id)?.at(-1)
+        const result=await axios.post("/api/chat/ai-suggestions",
+          {message:lastMessage?.text,role:"user"})
+          setSuggestions(result.data)
+          setLoading(false)
+      } catch(error){
+        console.log(error)
+        setLoading(false)
+      }
+    }
 
   return (
     <div className="w-full min-h-screen bg-linear-to-b from-green-50 to-white">
@@ -189,39 +203,39 @@ function TrackOrder({ params }: { params: { orderId: string } }) {
           </div>
 
           <div className="bg-white rounded-3xl border shadow-lg h-[430px] flex flex-col p-4">
+            <div className="flex justify-between items-center mb-3">
+              <span className="font-semibold text-gray-700 text-sm">
+                Quick Replies
+              </span>
 
-               <div className="flex justify-between items-center mb-3">
-      <span className="font-semibold text-gray-700 text-sm">Quick Replies</span>
+              <motion.button
+              disabled={loading}
+                whileTap={{ scale: 0.9 }}
+                className="bg-purple-100 text-purple-700 px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer"
+                onClick={getSuggestion}
+              >
+                <Sparkle size={14} />
+                {loading?<Loader className="w-5 h-5 animate-spin"/>: "AI suggest"}
+              </motion.button>
+            </div>
 
-      <motion.button
-      whileTap={{scale:0.9}}
-      className="bg-purple-100 text-purple-700 px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer"
-      >
-        <Sparkle size={16}/>AI suggest
+            <div className="flex gap-2 flex-wrap mb-3">
+              {suggestions.map((s, i) => (
+                <motion.div
+                  key={s}
+                  whileTap={{ scale: 0.92 }}
+                  className="cursor-pointer px-3 py-1 text-xs bg-green-50 border border-green-200 text-green-700 rounded-full"
+                  onClick={() => setNewMessage(s)}
+                >
+                  {s}
+                </motion.div>
+              ))}
+            </div>
 
-      </motion.button>
-    </div>
-
-    <div className="flex gap-2 flex-wrap mb-3">
-      {suggestions.map((s, i)=> (
-        <motion.div
-        key={s}
-        whileTap={{scale: 0.92}}
-        className="cursor-pointer px-3 py-1 text-xs bg-green-50 border border-green-200 text-green-700 rounded-full"
-        onClick={()=>setNewMessage(s)}
-        >
-          {s}
-
-        </motion.div>
-      ))
-
-      }
-
-    </div>
-
-
-
-            <div className="flex-1 overflow-y-auto p-2 space-y-3" ref={chatBoxRef}>
+            <div
+              className="flex-1 overflow-y-auto p-2 space-y-3"
+              ref={chatBoxRef}
+            >
               <AnimatePresence>
                 {messages?.map((msg, index) => (
                   <motion.div

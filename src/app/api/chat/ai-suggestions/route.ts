@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     .map((s:string)=>s.trim())
 
     return NextResponse.json(
-        data,{status:200}
+        suggestions,{status:200}
     )
   } catch (error) {
 
