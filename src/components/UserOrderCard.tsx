@@ -15,44 +15,44 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-interface IOrder{
-    _id?:mongoose.Types.ObjectId
-    user:mongoose.Types.ObjectId
-    items:[
-        {
-            grocery:mongoose.Types.ObjectId
-            name:string,
-            price:string,
-            unit:string,
-            image:string,
-            quantity:number
-        }
-    ]
-    isPaid:boolean
-    totalAmount:number,
-    paymentMethod:"cod" | "online"
-    address:{
-        fullName:string,
-        mobile:string,
-        city:string,
-        state:string,
-        pincode:string,
-        fullAddress:string
-        latitude:number,
-        longitude:number
-    }
-    assignment?:mongoose.Types.ObjectId
-    assignedDeliveryBoy?: IUser
-    status:"pending"|"out of delivery"|"delivered",
-    createdAt?:Date
-    updatedAt?:Date
+interface IOrder {
+  _id?: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  items: [
+    {
+      grocery: mongoose.Types.ObjectId;
+      name: string;
+      price: string;
+      unit: string;
+      image: string;
+      quantity: number;
+    },
+  ];
+  isPaid: boolean;
+  totalAmount: number;
+  paymentMethod: "cod" | "online";
+  address: {
+    fullName: string;
+    mobile: string;
+    city: string;
+    state: string;
+    pincode: string;
+    fullAddress: string;
+    latitude: number;
+    longitude: number;
+  };
+  assignment?: mongoose.Types.ObjectId;
+  assignedDeliveryBoy?: IUser;
+  status: "pending" | "out of delivery" | "delivered";
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 function UserOrderCard({ order }: { order: IOrder }) {
   const [expanded, setExpanded] = useState(false);
-  const [status,setStatus]=useState(order.status)
+  const [status, setStatus] = useState(order.status);
 
-  const router=useRouter()
+  const router = useRouter();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,16 +67,15 @@ function UserOrderCard({ order }: { order: IOrder }) {
     }
   };
 
-  useEffect(():any=>{
-    const socket=getSocket()
-    socket.on("order-status-update",(data)=>{
-      if(data.orderId.toString()==order?._id!.toString()){
-        setStatus(data.status)
+  useEffect((): any => {
+    const socket = getSocket();
+    socket.on("order-status-update", (data) => {
+      if (data.orderId.toString() == order?._id!.toString()) {
+        setStatus(data.status);
       }
-    })
-  })
-
-
+    });
+    return ()=>socket.off("order-status-update")
+  },[]);
 
   return (
     <motion.div
@@ -100,19 +99,21 @@ function UserOrderCard({ order }: { order: IOrder }) {
         </div>
 
         <div className="flex flex-wrap items-center gapp-2">
-          <span
-            className={`px-3 py-1 text-xs font-semibold rounded-full border ${
-              order.isPaid
-                ? "bg-green-100 text-green-7000 border-green-300"
-                : "bg-red-100 text-red-700 border-red-300"
-            }`}
-          >
-            {order.isPaid ? "paid" : "unpaid"}
-          </span>
+          {status !== "delivered" && (
+            <span
+              className={`px-3 py-1 text-xs font-semibold rounded-full border ${
+                order.isPaid
+                  ? "bg-green-100 text-green-7000 border-green-300"
+                  : "bg-red-100 text-red-700 border-red-300"
+              }`}
+            >
+              {order.isPaid ? "paid" : "unpaid"}
+            </span>
+          )}
 
           <span
             className={`px-3 py-1 text-xs font-semibold border rounded-full ${getStatusColor(
-              status
+              status,
             )}`}
           >
             {status}
@@ -120,105 +121,141 @@ function UserOrderCard({ order }: { order: IOrder }) {
         </div>
       </div>
 
-
-      <div className="p-5 space-y-4">
-        {order.paymentMethod == "cod" ? (
-          <div className="flex items-center gap-2 text-gray-700 text-sm">
-            <Truck size={16} className="text-green-600" />
-            Cash On Delivery
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-gray-700 text-sm">
-            <CreditCard size={16} className="text-green-600" />
-            Online Payment
-          </div>
-        )}
-
-        {order.assignedDeliveryBoy && <><div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3 text-sm text-gray-700">
-              <UserCheck className="text-blue-600" size={18}/>
-              <div className="font-semibold text-gray-800">
-                <p>Assigned to: <span>{order.assignedDeliveryBoy.name}</span></p>
-
-                <p className="text-xs text-gray-600">📞+880{order.assignedDeliveryBoy.mobile}</p>
-              </div>
-            </div>
-
-            <a href={`tel:${order.assignedDeliveryBoy.mobile}`} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">call</a>          
-          </div>
-
-          <button className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700" onClick={()=>router.push(`/user/track-order/${order._id?.toString()}`)}><Truck size={18}/>Truck Your Order</button>
-          </> 
-          }
-
-        <div className="flex items-center gap-2 text-gray-700 text-sm">
-          <MapPin size={16} className="text-green-600" />
-          <span className="truncate">{order.address.fullAddress}</span>
-        </div>
-
-        <div className="border-t border-gray-200 pt-3">
-          <button
-            onClick={() => setExpanded((prev) => !prev)}
-            className="w-full flex justify-between items-center text-sm font-medium text-gray-700 hover:text-green-700 transition"
-          >
-            <span className="flex items-center gap-2">
-              <Package size={16} className="text-green-600" />
-              {expanded
-                ? "Hide Order Items"
-                : `view ${order.items.length} Items`}
-            </span>
-
-            {expanded ? (
-              <ChevronUp size={16} className="text-green-600" />
-            ) : (
-              <ChevronDown size={16} className="text-green-600" />
-            )}
-          </button>
-
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: expanded ? "auto" : 0,
-              opacity: expanded ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="mt-3 space-y-3">
-              {order.items.map((item, index) => (
-                <div key={index}
-                className="flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition">
-                  <div className="flex items-center gap-3">
-
-                    <Image src={item.image} alt={item.name} width={48} height={48} className="rounded-lg object-cover border border-gray-200"/>
-
-                    <div>
-                        <p className="text-sm font-medium text-gray-800">{item.name}</p>
-                        <p className="text-xs text-gray-500">{item.quantity} x {item.unit}</p>
-                    </div>
-                  </div>
-                  
-                  <p className="text-sm font-semibold text-gray-800">${Number(item.price)*item.quantity}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="border-t pt-3 flex justify-between items-center text-sm font-semibold text-gray-800">
+      {status != "delivered" && (
+        <div className="p-5 space-y-4">
+          {order.paymentMethod == "cod" ? (
             <div className="flex items-center gap-2 text-gray-700 text-sm">
-                <Truck size={16} className="text-green-600"/>
-                <span>Delivery: <span className="text-green-700 font-semibold">{status}</span></span>
+              <Truck size={16} className="text-green-600" />
+              Cash On Delivery
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-gray-700 text-sm">
+              <CreditCard size={16} className="text-green-600" />
+              Online Payment
+            </div>
+          )}
+
+          {order.assignedDeliveryBoy && (
+            <>
+              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3 text-sm text-gray-700">
+                  <UserCheck className="text-blue-600" size={18} />
+                  <div className="font-semibold text-gray-800">
+                    <p>
+                      Assigned to: <span>{order.assignedDeliveryBoy.name}</span>
+                    </p>
+
+                    <p className="text-xs text-gray-600">
+                      📞+880{order.assignedDeliveryBoy.mobile}
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={`tel:${order.assignedDeliveryBoy.mobile}`}
+                  className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-blue-700 transition"
+                >
+                  call
+                </a>
+              </div>
+
+              <button
+                className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow hover:bg-green-700"
+                onClick={() =>
+                  router.push(`/user/track-order/${order._id?.toString()}`)
+                }
+              >
+                <Truck size={18} />
+                Truck Your Order
+              </button>
+            </>
+          )}
+
+          <div className="flex items-center gap-2 text-gray-700 text-sm">
+            <MapPin size={16} className="text-green-600" />
+            <span className="truncate">{order.address.fullAddress}</span>
+          </div>
+
+          <div className="border-t border-gray-200 pt-3">
+            <button
+              onClick={() => setExpanded((prev) => !prev)}
+              className="w-full flex justify-between items-center text-sm font-medium text-gray-700 hover:text-green-700 transition"
+            >
+              <span className="flex items-center gap-2">
+                <Package size={16} className="text-green-600" />
+                {expanded
+                  ? "Hide Order Items"
+                  : `view ${order.items.length} Items`}
+              </span>
+
+              {expanded ? (
+                <ChevronUp size={16} className="text-green-600" />
+              ) : (
+                <ChevronDown size={16} className="text-green-600" />
+              )}
+            </button>
+
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{
+                height: expanded ? "auto" : 0,
+                opacity: expanded ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-3 space-y-3">
+                {order.items.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={48}
+                        height={48}
+                        className="rounded-lg object-cover border border-gray-200"
+                      />
+
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {item.quantity} x {item.unit}
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-semibold text-gray-800">
+                      ${Number(item.price) * item.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="border-t pt-3 flex justify-between items-center text-sm font-semibold text-gray-800">
+            <div className="flex items-center gap-2 text-gray-700 text-sm">
+              <Truck size={16} className="text-green-600" />
+              <span>
+                Delivery:{" "}
+                <span className="text-green-700 font-semibold">{status}</span>
+              </span>
             </div>
 
             <div>
-                Total: <span className="text-green-700 font-bold">${order.totalAmount}</span>
+              Total:{" "}
+              <span className="text-green-700 font-bold">
+                ${order.totalAmount}
+              </span>
             </div>
-
+          </div>
         </div>
-
-
-      </div>
+      )}
     </motion.div>
   );
 }

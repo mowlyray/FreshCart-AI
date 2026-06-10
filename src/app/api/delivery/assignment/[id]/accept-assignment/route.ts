@@ -47,6 +47,12 @@ export async function GET(req:NextRequest,{params}:{params:{id:string}}) {
         order.assignedDeliveryBoy=deliveryBoyId
         await order.save()
 
+        await order.populate("assignedDeliveryBoy")
+
+        await emitEventHandler("order-assigned",{orderId:order._id,
+            assignedDeliveryBoy:order.assignedDeliveryBoy
+        })
+
         await DeliveryAssignment.updateMany(
             {_id:{$ne:assignment._id},
             brodcastedTo:deliveryBoyId,

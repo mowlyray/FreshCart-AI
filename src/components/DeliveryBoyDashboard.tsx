@@ -88,7 +88,7 @@ function DeliveryBoyDashboard() {
   const handleAccept=async (id:string)=>{
     try {
         const result=await axios.get(`/api/delivery/assignment/${id}/accept-assignment`)
-        console.log(result)
+        fetchCurrentOrder()
     } catch (error) {
         console.log(error)
 
@@ -178,7 +178,7 @@ function DeliveryBoyDashboard() {
             {!activeOrder.order.deliveryOtpVerification && !showOtpBox && (
               <button 
               onClick={sendOtp}
-              className="w-full py-4 bg-green-600 text-center text-white rounded-lg">{sendOtpLoading?<Loader size={16} className="animate-spin text-white"/>:"Mark as Delivered"}</button>
+              className="w-full py-4 bg-green-600 text-center text-white rounded-lg">{sendOtpLoading?<Loader size={16} className="animate-spin text-white text-center"/>:"Mark as Delivered"}</button>
 
             )}
             {
@@ -186,7 +186,7 @@ function DeliveryBoyDashboard() {
               <div className="mt-4">
                 <input type="text" className="w-full py-3 border rounded-lg text-center" placeholder="Enter Otp" maxLength={4} onChange={(e)=>setOtp(e.target.value)} value={otp}/>
                 <button className="w-full text-center mt-4 bg-blue-600 text-white ppy-3 rounded-lg" onClick={verifyOtp}>
-                  {verifyOtpLoading?<Loader size={16} className="animate-spin text-white"/>:"Verify OTP"}
+                  {verifyOtpLoading?<Loader size={16} className="animate-spin text-white text-center"/>:"Verify OTP"}
                 </button>
                 {otpError && <div className="text-red-600 mt-2">{otpError}</div>}
 

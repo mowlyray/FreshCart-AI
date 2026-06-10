@@ -1,6 +1,7 @@
 "use client";
 
 
+import { getSocket } from "@/lib/socket";
 import { IUser } from "@/models/user.model";
 import axios from "axios";
 import { motion } from "framer-motion";
@@ -75,6 +76,16 @@ function AdminOrderCard({ order }: { order: IOrder }) {
     setStatus(order.status)
   },[order])
 
+  useEffect((): any => {
+      const socket = getSocket();
+      socket.on("order-status-update", (data) => {
+        if (data.orderId.toString() == order?._id!.toString()) {
+          setStatus(data.status);
+        }
+      });
+      return ()=>socket.off("order-status-update")
+    },[]);
+
   return (
     <motion.div
       key={order._id?.toString()}
@@ -89,7 +100,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
             <Package size={20} />
             Order #{order._id?.toString().slice(-6)}
           </p>
-          <span
+          {status!="delivered" &&  <span
             className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${
               order.isPaid
                 ? "bg-green-100 text-green-700 border-green-300"
@@ -97,7 +108,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
             }`}
           >
             {order.isPaid ? "Paid" : "Unpaid"}
-          </span>
+          </span>}
           <p className="text-gray-500 text-sm">
             {new Date(order.createdAt!).toLocaleString()}
           </p>
@@ -159,7 +170,7 @@ function AdminOrderCard({ order }: { order: IOrder }) {
           >
             {status}
           </span>
-          <select
+          {status !="delivered" && <select
             className="border border-gray-300 rounded-lg px-3 py-1 text-sm shadow-sm hover:border-green-400 transition focus:ring-2 focus:ring-green-500 outline-none"
             value={status}
             onChange={(e) => {
@@ -172,7 +183,8 @@ function AdminOrderCard({ order }: { order: IOrder }) {
                 {st.toUpperCase()}
               </option>
             ))}
-          </select>
+          </select>}
+          
         </div>
       </div>
 
