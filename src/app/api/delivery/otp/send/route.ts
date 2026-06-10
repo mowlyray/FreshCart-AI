@@ -9,22 +9,31 @@ export async function POST(req:NextRequest){
     try {
         await connectDb()
         const {orderId}=await req.json()
-        const order=await Order.findById(orderId)
+        const order=await Order.findById(orderId).populate("user");
+        
         if(!order){
             return NextResponse.json(
                 {message:"order not found"},
                 {status:400}
             )
         }
+        const user = order.user as any;
+        if (!user?.email) {
+  return NextResponse.json(
+    { message: "User email not found" },
+    { status: 400 }
+  );
+}
 
-        const otp=Math.floor(10000+Math.random()*9000).toString()
+        const otp=Math.floor(1000+Math.random()*9000).toString()
         order.deliveryOtp=otp
         await order.save()
+        
 
         await sendMail(
-            order.user.email,
+            user.email,
             "Your Delivery OTP",
-            `<h2>Your Delivery OTP is <strong>${otp}</strong>`
+            `<h2>Your Delivery OTP is <strong>${otp}</strong></h2>`
         )
         return NextResponse.json(
                 {message:"otp sent successfully"},
