@@ -108,8 +108,8 @@ function AddGrocery() {
 
               <select name="category" value={category} className='w-full border border-gray-300 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-green-400 transition-all bg-white' onChange={(e)=>setCategory(e.target.value)}>
                 <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
+                {categories.map((cat,i) => (
+                  <option key={i} value={cat}>
                     {cat}
                   </option>
                 ))}
